@@ -1,0 +1,17 @@
+audio/
+audio_eng/
+bin/
+include
+lib/
+lib64/
+share/
+**/*.m4a
+**/*.mp3
+**/*.out
+**/*.cfg
+__pycache__
+.env
+*.deb
+cron/
+lib64
+log

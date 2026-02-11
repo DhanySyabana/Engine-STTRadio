@@ -1,0 +1,7 @@
+pymongo==4.8.0
+mysql-connector-python==9.2.0
+marshmallow-dataclass==8.7.1
+pydub==0.25.1
+pydub-stubs==0.25.1.5
+python-dotenv==1.0.1
+tqdm==4.67.1

@@ -32,8 +32,14 @@ class STTModel:
         result = self.__model.transcribe(audio, batch_size=batch_size, language=lang, num_workers=self.__workers)
         ret : List[TranscribeResult] = []
         for seg in result['segments']:
-            ret.append(
-                TranscribeResult(**seg)
+           ret.append(
+                TranscribeResult(
+                    text=seg.get("text", ""),
+                    start=seg.get("start", 0.0),
+                    end=seg.get("end", 0.0),
+                    language=result.get("language", lang),
+                    language_confidence=result.get("language_probability")
+                )
             )
         return ret
     def transcribe_with_lock(self, audio: Union[np.ndarray, str], batch_size: int = 4, lang: str = "id") -> List[TranscribeResult]:

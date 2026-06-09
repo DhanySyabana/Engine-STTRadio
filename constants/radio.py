@@ -28,6 +28,8 @@ channels: Dict[int, Radio] = {
     16: Radio(id=16, nama='KBR Radio', path="/home/stt/RAW-RADIO/kbr"),
     17: Radio(id=17, nama='GEN FM', path="/home/stt/RAW-RADIO/genfm"),
     18: Radio(id=18, nama='KIS FM', path="/home/stt/RAW-RADIO/kisfm"),
-    19: Radio(id=19, nama='Most FM', path="/home/stt/RAW-RADIO/mostfm")
+    19: Radio(id=19, nama='Most FM', path="/home/stt/RAW-RADIO/mostfm"),
+    21: Radio(id=21, nama='Istana Radio', path="/home/stt/RAW-RADIO/istana"),
+    22: Radio(id=22, nama='Radio DMS', path="/home/stt/RAW-RADIO/radiodms"),
 }
 

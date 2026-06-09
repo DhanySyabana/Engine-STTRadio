@@ -25,7 +25,7 @@ load_dotenv()
 
 def run(engine: Engine):
     while True:
-        froom = datetime.now() - timedelta(days=5)
+        froom = datetime.now() - timedelta(days=3)
         now = datetime.now() - timedelta(hours=1)
         try:
             engine.run_timestamps(start_date=froom.strftime("%Y-%m-%d %H:%M:%S"), end_date=now.strftime("%Y-%m-%d %H:%M:%S"))
@@ -35,7 +35,7 @@ def run(engine: Engine):
 
 
 CHANNELS = [
-            1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19
+            1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22
         ]
 
 if __name__ == '__main__':

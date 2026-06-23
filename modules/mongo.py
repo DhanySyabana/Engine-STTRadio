@@ -1,68 +1,98 @@
 import pymongo
 from datetime import datetime
+from typing import List
+import os
+from dotenv import load_dotenv
 
-from custom_types.engine import TranskripStatus
-client = pymongo.MongoClient('10.10.10.32', 27018)
-db = client.stt
-def addNewWatchLog(dt: datetime, channel, startTime: datetime, tries = 0):
-    return db.watch_log.insert_one({
-            "time"  : dt,
-            "channel": channel,
-            "status" : "STARTED",
-            "starttime": startTime,
-            "tries": tries
-        }).inserted_id
 
-def updateWatchLogStatus(id, status, error = None, tries = None):
-    update = {'status': status}
-    if status =='COMPLETED' or status == 'FAILED':
-        update["endtime"] = datetime.now()
-    if error is not None:
-        update["error"] = error
-    update['tries'] = tries if tries is not None else 0
-    print('update : ', update)
-    return db.watch_log.update_one(
-            {
-                '_id' : id    
-            }, 
-            {
-                '$set': update
+load_dotenv()
+
+MONGO_HOST     = os.getenv('MONGO_HOST', 'localhost')
+MONGO_PORT     = int(os.getenv('MONGO_PORT', 27017))
+MONGO_DATABASE = os.getenv('MONGO_DATABASE', 'dl_streamings')
+MONGO_USERNAME = os.getenv('MONGO_USERNAME')
+MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
+
+if MONGO_USERNAME and MONGO_PASSWORD:
+    client = pymongo.MongoClient(
+        f'mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/'
+    )
+else:
+    client = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
+
+db = client[MONGO_DATABASE]
+
+
+def get_pending_streams(scrapper_name: str, start_date: str, end_date: str) -> List[dict]:
+
+    try:
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+        end_dt   = datetime.strptime(end_date,   "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+        end_dt   = datetime.strptime(end_date,   "%Y-%m-%d")
+
+    cursor = db['streams'].find(
+        {
+            'scrapper_name': scrapper_name,
+            'source': 'radio',
+            # Handle kemungkinan trailing space pada nilai status
+            'status_transcript': {'$regex': r'^\s*(PENDING|FAILED)\s*$', '$options': 'i'},
+            'date': {'$gte': start_dt, '$lte': end_dt},
+        },
+        sort=[('date', 1)],
+    )
+    return list(cursor)
+
+
+def mark_stream_in_progress(stream_id) -> None:
+    db['streams'].update_one(
+        {'_id': stream_id},
+        {
+            '$set': {
+                'status_transcript': 'IN_PROGRESS',
+                'updated_at': datetime.now(),
+                'updated_by': 'engine_stt_1',
             }
-            )
-def getLastProcessedAudio(channel):
-    return db.watch_log.find_one({'channel': channel}, sort=[('starttime', -1)])
+        },
+    )
 
-def SaveResults(result: str , channel: str, channelAlias: str, time: datetime):                                                                                                               
-    # print("Saving {} tweets to database...".format(len(tweets)))                                                                                        
-    return db['result_stt'].insert_one(
-            {
-                'result' : result,
-                'channel': channel,
-                'channelAlias': channelAlias,
-                'time': time
-            })                                                                                                                                                
 
-def save_audio_chunk(nama_audio: str, total_chunk: int, current_chunk: int, detik_awal: int, detik_akhir: int, result: str, status: TranskripStatus, verbose: bool = False):
-    return db['stt_chunk'].insert_one(
-            {
-                'nama_audio': nama_audio,
-                'current_chunk': current_chunk,
+def push_chunk_to_stream(stream_id, chunk_data: dict) -> None:
+
+    db['streams'].update_one(
+        {'_id': stream_id},
+        {
+            '$push': {'chunks': chunk_data},
+            '$set': {
+                'updated_at': datetime.now(),
+                'updated_by': 'engine_stt_1',
+            },
+        },
+    )
+
+
+def complete_stream(
+    stream_id,
+    transcript: str,
+    total_chunk: int,
+    status: str,
+) -> None:
+
+    status_map = {
+        'SUCCESS': 'COMPLETED',
+        'SILENT':  'SILENT',
+        'UNKOWN':  'FAILED',
+    }
+    db['streams'].update_one(
+        {'_id': stream_id},
+        {
+            '$set': {
+                'status_transcript': status_map.get(status, 'FAILED'),
+                'transcript': transcript,
                 'total_chunk': total_chunk,
-                'detik_awal': detik_awal,
-                'detik_akhir': detik_akhir,
-                'result': result,
-                'status': status.name
+                'updated_at': datetime.now(),
+                'updated_by': 'engine_stt_1',
             }
-            )
-def save_audio(nama_audio: str, result:str, status: TranskripStatus, progress_transkrip: float, verbose: bool = False):
-    return db['stt_audio'].insert_one(
-            {
-                'nama_audio': nama_audio,
-                'result': result,
-                'status': status.name,
-                'progress_transkrip': progress_transkrip
-
-            }
-            )
-
-
+        },
+    )

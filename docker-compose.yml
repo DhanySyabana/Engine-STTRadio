@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  stt-engine-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stt-radio-engine-dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    # Jika Anda ingin menyimpan file model ke dalam volume agar tidak perlu download ulang setiap rebuild
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/torch:/root/.cache/torch
+
+    # ====================================================================
+    # HAPUS KOMENTAR PADA BLOK DI BAWAH INI JIKA ANDA MENGGUNAKAN GPU NVIDIA
+    # ====================================================================
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

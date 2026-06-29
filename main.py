@@ -105,7 +105,7 @@ def run(engine: Engine):
     """Loop utama per channel: ambil audio PENDING 3 hari ke belakang, transkrip, ulangi tiap 60 detik."""
     while True:
         start = (datetime.now() - timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
-        end   = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%d %H:%M:%S")
+        end   = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
 
         try:
             engine.run_timestamps(start_date=start, end_date=end)
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     engines = []
 
     for chan in CHANNELS[0:half]:
-        engine = Engine(scrapper_name=chan)
+        engine = Engine()
         engine.set_model(model)
         engines.append(engine)
 

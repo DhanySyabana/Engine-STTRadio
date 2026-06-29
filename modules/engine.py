@@ -18,26 +18,23 @@ from modules.mongo import (
 from modules.telegram_alert import send_telegram_alert
 
 class Engine:
-    def __init__(self, scrapper_name: str):
-
-        self.__scrapper_name = scrapper_name
-        logging.info(f"Engine siap untuk channel: {scrapper_name}")
+    def __init__(self):
+        logging.info(f"Engine Ready To Running")
 
     def set_model(self, model: STTModel):
         self.__model = model
 
     def run_timestamps(self, start_date: str, end_date: str):
 
-        streams = get_pending_streams(self.__scrapper_name, start_date, end_date)
+        streams = get_pending_streams(start_date, end_date)
 
         if not streams:
             logging.info(
-                f"[channel={self.__scrapper_name}] Tidak ada audio PENDING "
-                f"dalam rentang {start_date} – {end_date}"
+                 f"Tidak ada audio PENDING dalam rentang {start_date} – {end_date}"
             )
             return
 
-        logging.info(f"[channel={self.__scrapper_name}] Jumlah audio: {len(streams)}")
+        logging.info(f"Jumlah audio: {len(streams)}")
 
         for stream in streams:
             stream_id  = stream['_id']

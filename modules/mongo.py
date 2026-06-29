@@ -23,7 +23,7 @@ else:
 db = client[MONGO_DATABASE]
 
 
-def get_pending_streams(scrapper_name: str, start_date: str, end_date: str) -> List[dict]:
+def get_pending_streams(start_date: str, end_date: str) -> List[dict]:
 
     try:
         start_dt = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -34,7 +34,6 @@ def get_pending_streams(scrapper_name: str, start_date: str, end_date: str) -> L
 
     cursor = db['streams'].find(
         {
-            'scrapper_name': scrapper_name,
             'source': 'radio',
             # Handle kemungkinan trailing space pada nilai status
             'status_transcript': {'$regex': r'^\s*(PENDING|FAILED)\s*$', '$options': 'i'},

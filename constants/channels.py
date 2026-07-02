@@ -1,9 +1,12 @@
 import logging
 from typing import List
 
+
 def load_channels() -> List[str]:
+
     try:
-        from modules.mongo import db
+        from modules.mongo import _get_db
+        db = _get_db()
 
         # Ambil channel_id unik dari streams
         channel_ids = db['streams'].distinct('channel_id')
@@ -24,35 +27,15 @@ def load_channels() -> List[str]:
             logging.info(f"Channel dimuat dari MongoDB: {result}")
             return result
 
+        logging.warning("Tidak ada channel ditemukan di MongoDB.")
+        return []
+
     except Exception as e:
         logging.error(
-            f"Gagal memuat channel dari MongoDB: {e}. Menggunakan fallback."
+            f"Gagal memuat channel dari MongoDB: {e}. "
+            f"Akan dicoba lagi di iterasi berikutnya."
         )
+        return []
 
-    return FALLBACK_CHANNELS
 
-
-# Fallback jika MongoDB tidak bisa diakses saat startup
-FALLBACK_CHANNELS: List[str] = [
-    'prambors',
-    'smartfm',
-    'elshintajkt',
-    'mnctrijayajakarta',
-    'rripro',
-    'sonorajkt',
-    'rripro1',
-    'rripro2',
-    'rripro4',
-    'passfm',
-    'suarasurabaya',
-    'iradio',
-    'rripro1banten',
-    'kbr',
-    'genfm',
-    'kisfm',
-    'mostfm',
-    'istana',
-    'radiodms',
-]
-
-CHANNELS: []
+CHANNELS: List[str] = []

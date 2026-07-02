@@ -55,4 +55,4 @@ FALLBACK_CHANNELS: List[str] = [
     'radiodms',
 ]
 
-CHANNELS: List[str] = load_channels()
+CHANNELS: []

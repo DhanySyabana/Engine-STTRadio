@@ -7,19 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGO_HOST     = os.getenv('MONGO_HOST', 'localhost')
-MONGO_PORT     = int(os.getenv('MONGO_PORT', 27017))
-MONGO_DATABASE = os.getenv('MONGO_DATABASE', 'dl_streamings')
-MONGO_USERNAME = os.getenv('MONGO_USERNAME')
-MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
+MONGO_URI = os.getenv("MONGO_URI")
+MONGO_DATABASE = os.getenv("MONGO_DATABASE", "dl_livestreams")
 
-if MONGO_USERNAME and MONGO_PASSWORD:
-    client = pymongo.MongoClient(
-        f'mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/'
-    )
-else:
-    client = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
-
+client = pymongo.MongoClient(MONGO_URI)
 db = client[MONGO_DATABASE]
 
 

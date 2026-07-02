@@ -13,14 +13,17 @@ services:
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ~/.cache/torch:/root/.cache/torch
+      # Mount folder storage radio dari host ke dalam container
+      # Path di host harus sama dengan file_path yang tersimpan di MongoDB
+      - /home/stt-radio-2/storage/radio_list:/home/kuradmin/storage/radio_list:ro
 
     # ====================================================================
     # HAPUS KOMENTAR PADA BLOK DI BAWAH INI JIKA ANDA MENGGUNAKAN GPU NVIDIA
     # ====================================================================
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

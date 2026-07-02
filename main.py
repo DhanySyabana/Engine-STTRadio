@@ -161,16 +161,19 @@ def run(engine: Engine):
 
 if __name__ == "__main__":
 
+    GPU_CONCURRENT_LIMIT = int(os.getenv("GPU_CONCURRENT_LIMIT", "1"))
+
     if GPU_READY:
 
         logging.info(
-            f"Loading GPU model ({GPU_MODEL})"
+            f"Loading GPU model ({GPU_MODEL}) with concurrent limit {GPU_CONCURRENT_LIMIT}"
         )
 
         model = STTModel(
             model_name=GPU_MODEL,
             device="cuda",
             compute_type=GPU_COMPUTE_TYPE,
+            concurrent_limit=GPU_CONCURRENT_LIMIT,
         )
 
     else:
@@ -183,6 +186,7 @@ if __name__ == "__main__":
             model_name=CPU_MODEL,
             device="cpu",
             compute_type=CPU_COMPUTE_TYPE,
+            concurrent_limit=1,
         )
 
     engine = Engine()

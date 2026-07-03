@@ -5,12 +5,16 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+ENV TZ=Asia/Jakarta
+
 # Install system dependencies (ffmpeg sangat penting untuk pydub dan Whisper)
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    git \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y ffmpeg && \
+    apt-get install -y --no-install-recommends tzdata && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory di dalam container
 WORKDIR /app

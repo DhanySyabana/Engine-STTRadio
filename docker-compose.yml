@@ -13,6 +13,7 @@ services:
     env_file:
       - .env
     volumes:
+      - .:/app
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ~/.cache/torch:/root/.cache/torch
       - /etc/localtime:/etc/localtime:ro

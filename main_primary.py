@@ -170,7 +170,7 @@ def run(engine: Engine, channels_key: str):
         channel_ids = load_channel_ids_from_module(channels_key)
 
         start = (
-            datetime.now() - timedelta(days=1)
+            datetime.now() - timedelta(days=2)
         ).strftime("%Y-%m-%d %H:%M:%S")
 
         end = (

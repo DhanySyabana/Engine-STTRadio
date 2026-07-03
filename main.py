@@ -128,7 +128,7 @@ def run(engine: Engine):
     while True:
 
         start = (
-            datetime.now() - timedelta(days=1)
+            datetime.now() - timedelta(days=2)
         ).strftime("%Y-%m-%d %H:%M:%S")
 
         end = (

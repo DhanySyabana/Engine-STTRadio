@@ -173,7 +173,7 @@ class Engine:
             if final_transcript.strip() == '' and final_status != 'UNKOWN':
                 final_status = 'SILENT'
 
-            logging.info(f"[{filename}] Transcript: {final_transcript[:120]}...")
+            logging.info(f"[{filename}] Transcript: {final_transcript}")
             complete_stream(
                 stream_id=stream_id,
                 transcript=final_transcript,

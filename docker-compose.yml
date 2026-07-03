@@ -7,12 +7,17 @@ services:
       dockerfile: Dockerfile
     container_name: stt-radio-engine-dev
     restart: unless-stopped
+    environment:
+      TZ: Asia/Jakarta
     env_file:
       - .env
     # Jika Anda ingin menyimpan file model ke dalam volume agar tidak perlu download ulang setiap rebuild
     volumes:
+      - .:/app
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ~/.cache/torch:/root/.cache/torch
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       # Mount folder storage radio dari host ke dalam container
       # Path di host harus sama dengan file_path yang tersimpan di MongoDB
       - /home/stt-radio-2/storage/radio_list:/home/kuradmin/storage/radio_list:ro

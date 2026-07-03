@@ -77,7 +77,7 @@ def db():
 # Helpers — semua fungsi menggunakan _get_db()
 # ─────────────────────────────────────────────
 
-def get_pending_streams(start_date: str, end_date: str) -> List[dict]:
+def get_pending_streams(start_date: str, end_date: str, channel_ids: List[dict] = None) -> List[dict]:
 
     try:
         start_dt = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -86,13 +86,19 @@ def get_pending_streams(start_date: str, end_date: str) -> List[dict]:
         start_dt = datetime.strptime(start_date, "%Y-%m-%d")
         end_dt   = datetime.strptime(end_date,   "%Y-%m-%d")
 
+    query = {
+        'source': 'radio',
+        # Handle kemungkinan trailing space pada nilai status
+        'status_transcript': {'$regex': r'^\s*(PENDING|FAILED)\s*$', '$options': 'i'},
+        'date': {'$gte': start_dt, '$lte': end_dt},
+    }
+
+    # Jika channel_ids didefinisikan, tambahkan filter ke query
+    if channel_ids is not None:
+        query['channel_id'] = {'$in': channel_ids}
+
     cursor = _get_db()['streams'].find(
-        {
-            'source': 'radio',
-            # Handle kemungkinan trailing space pada nilai status
-            'status_transcript': {'$regex': r'^\s*(PENDING|FAILED)\s*$', '$options': 'i'},
-            'date': {'$gte': start_dt, '$lte': end_dt},
-        },
+        query,
         sort=[('date', 1)],
     )
     return list(cursor)

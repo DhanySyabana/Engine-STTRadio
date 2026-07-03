@@ -1,25 +1,50 @@
 version: '3.8'
 
 services:
-  stt-engine-dev:
+  stt-engine-1:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: stt-radio-engine-dev
+    container_name: stt-radio-engine-1
+    command: python main_primary.py
     restart: unless-stopped
+    environment:
+      TZ: Asia/Jakarta
     env_file:
       - .env
-    # Jika Anda ingin menyimpan file model ke dalam volume agar tidak perlu download ulang setiap rebuild
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
       - ~/.cache/torch:/root/.cache/torch
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       # Mount folder storage radio dari host ke dalam container
-      # Path di host harus sama dengan file_path yang tersimpan di MongoDB
       - /home/stt-radio-2/storage/radio_list:/home/kuradmin/storage/radio_list:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
-    # ====================================================================
-    # HAPUS KOMENTAR PADA BLOK DI BAWAH INI JIKA ANDA MENGGUNAKAN GPU NVIDIA
-    # ====================================================================
+  stt-engine-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stt-radio-engine-2
+    command: python main_secondary.py
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Jakarta
+    env_file:
+      - .env
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/torch:/root/.cache/torch
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      # Mount folder storage radio dari host ke dalam container
+      - /home/stt-radio-2/storage/radio_list:/home/kuradmin/storage/radio_list:ro
     deploy:
       resources:
         reservations:

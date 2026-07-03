@@ -47,9 +47,9 @@ class Engine:
     def set_model(self, model: STTModel):
         self.__model = model
 
-    def run_timestamps(self, start_date: str, end_date: str):
+    def run_timestamps(self, start_date: str, end_date: str, channel_ids: list = None):
 
-        streams = get_pending_streams(start_date, end_date)
+        streams = get_pending_streams(start_date, end_date, channel_ids)
 
         if not streams:
             logging.info(
